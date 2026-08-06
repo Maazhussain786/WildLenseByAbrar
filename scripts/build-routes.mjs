@@ -38,12 +38,6 @@ function haversineKm([lat1, lon1], [lat2, lon2]) {
   return 2 * R * Math.asin(Math.sqrt(a));
 }
 
-function pathLengthKm(points) {
-  let total = 0;
-  for (let i = 1; i < points.length; i++) total += haversineKm(points[i - 1], points[i]);
-  return total;
-}
-
 /** Ramer–Douglas–Peucker, on raw lat/lng — good enough at this scale. */
 function simplify(points, tolerance) {
   if (points.length < 3) return points;
