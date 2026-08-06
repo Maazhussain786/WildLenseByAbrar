@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "build:routes": "node scripts/build-routes.mjs"
+    "build:routes": "node scripts/build-routes.mjs",
+    "review": "node scripts/list-review.mjs"
   },
   "dependencies": {
     "leaflet": "^1.9.4",
