@@ -37,7 +37,17 @@ function boundsOf(legs: Leg[]): L.LatLngBounds {
   return L.latLngBounds(pts);
 }
 
-/** Fits the whole journey once, reports zoom, and eases to the focused leg. */
+/**
+ * Owns everything about where the map is looking: the opening frame, easing to
+ * a focused leg, reporting zoom, and re-measuring when the container resizes.
+ *
+ * Leaflet caches its container size, so it draws tiles into a stale rectangle
+ * if the element changes size after init. Worse, the opening `fitBounds` runs
+ * before the flex layout has settled, which on a phone leaves the map framed on
+ * the wrong part of the world. So a resize both re-measures and re-frames —
+ * but only while the view is still the one we chose, never after the reader has
+ * panned or zoomed somewhere themselves.
+ */
 function MapController({
   legs,
   focusId,
@@ -49,21 +59,64 @@ function MapController({
 }) {
   const map = useMap();
   const didFit = useRef(false);
+  const userMoved = useRef(false);
+  /** True while a move we started is in flight, so it isn't read as the user's. */
+  const programmatic = useRef(false);
+  /** Read by the resize observer, which must not re-subscribe on every focus. */
+  const focusRef = useRef(focusId);
+  useEffect(() => {
+    focusRef.current = focusId;
+  }, [focusId]);
+
+  const move = useCallback(
+    (fn: () => void) => {
+      programmatic.current = true;
+      fn();
+      // Cleared on moveend; this covers moves that settle synchronously.
+      requestAnimationFrame(() => {
+        programmatic.current = false;
+      });
+    },
+    []
+  );
+
+  const fitAll = useCallback(() => {
+    move(() => map.fitBounds(boundsOf(legs), { padding: [56, 56] }));
+  }, [map, legs, move]);
 
   useEffect(() => {
     if (didFit.current) return;
     didFit.current = true;
-    map.fitBounds(boundsOf(legs), { padding: [56, 56] });
+    fitAll();
     onZoom(map.getZoom());
-  }, [map, legs, onZoom]);
+  }, [fitAll, map, onZoom]);
 
   useEffect(() => {
-    const handler = () => onZoom(map.getZoom());
-    map.on('zoomend', handler);
+    const onZoomEnd = () => onZoom(map.getZoom());
+    const onMoveStart = () => {
+      if (!programmatic.current) userMoved.current = true;
+    };
+    const onMoveEnd = () => {
+      programmatic.current = false;
+    };
+    map.on('zoomend', onZoomEnd);
+    map.on('movestart', onMoveStart);
+    map.on('moveend', onMoveEnd);
     return () => {
-      map.off('zoomend', handler);
+      map.off('zoomend', onZoomEnd);
+      map.off('movestart', onMoveStart);
+      map.off('moveend', onMoveEnd);
     };
   }, [map, onZoom]);
+
+  useEffect(() => {
+    const observer = new ResizeObserver(() => {
+      map.invalidateSize({ animate: false });
+      if (!userMoved.current && !focusRef.current) fitAll();
+    });
+    observer.observe(map.getContainer());
+    return () => observer.disconnect();
+  }, [map, fitAll]);
 
   useEffect(() => {
     if (!focusId) return;
@@ -71,13 +124,17 @@ function MapController({
     if (!leg) return;
     const animate = !prefersReducedMotion();
 
-    if (leg.fromCity === leg.toCity) {
-      map.setView(leg.fromCoords, Math.max(map.getZoom(), 9), { animate });
-      return;
-    }
-    const pts = (leg.routeGeometry?.length ? leg.routeGeometry : [leg.fromCoords, leg.toCoords]) as L.LatLngExpression[];
-    map.fitBounds(L.latLngBounds(pts), { padding: [80, 80], animate, maxZoom: 11 });
-  }, [focusId, legs, map]);
+    move(() => {
+      if (leg.fromCity === leg.toCity) {
+        map.setView(leg.fromCoords, Math.max(map.getZoom(), 9), { animate });
+        return;
+      }
+      const pts = (
+        leg.routeGeometry?.length ? leg.routeGeometry : [leg.fromCoords, leg.toCoords]
+      ) as L.LatLngExpression[];
+      map.fitBounds(L.latLngBounds(pts), { padding: [80, 80], animate, maxZoom: 11 });
+    });
+  }, [focusId, legs, map, move]);
 
   return null;
 }

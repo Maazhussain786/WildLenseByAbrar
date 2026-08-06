@@ -24,7 +24,9 @@ export default function Header({ playing, onTogglePlay, progress }: Props) {
     <header className="relative z-[900] shrink-0 border-b border-ink-800 bg-ink-900">
       <div className="flex items-center gap-4 px-4 py-2.5 sm:px-5">
         <div className="min-w-0 flex-1">
-          <h1 className="truncate font-display text-[19px] leading-tight text-mist-100 sm:text-[22px]">
+          {/* Wraps rather than truncates: losing "Saudi Arabia" would cost the
+              headline its point on a narrow screen. */}
+          <h1 className="font-display text-[18px] leading-tight text-mist-100 sm:text-[22px]">
             Wild Lens by Abrar
             <span className="mx-2 text-ember">—</span>
             <span className="text-mist-300">Pakistan → Saudi Arabia</span>

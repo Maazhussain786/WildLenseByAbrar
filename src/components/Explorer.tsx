@@ -94,6 +94,8 @@ export default function Explorer() {
       const next = !p;
       if (next) {
         setSelectedId(null);
+        // A hover left over from before would otherwise outrank the play-through.
+        setHover(null);
         // Restart if the previous run finished.
         setPlayIndex((i) => (i + 1 >= LEGS.length ? 0 : i));
       }
