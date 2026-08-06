@@ -33,11 +33,21 @@ export type Projection = 'globe' | 'mercator';
 
 type Props = {
   legs: Leg[];
-  activeId: string | null;
+  /**
+   * Legs drawn in the accent colour. Usually one, but hovering a country in the
+   * list lights up that whole stretch of the journey at once.
+   */
+  activeIds: string[];
   onHover: (id: string | null, point?: { x: number; y: number }) => void;
   onSelect: (id: string) => void;
-  focusId: string | null;
+  /** Legs to frame. One gets a close-up; several get fitted together. */
+  focusIds: string[] | null;
   projection: Projection;
+  /**
+   * Space taken by floating UI, so the journey is framed in the part of the
+   * map the reader can actually see rather than behind the panel.
+   */
+  framePadding?: { top?: number; right?: number; bottom?: number; left?: number };
   onReady?: () => void;
 };
 
@@ -61,24 +71,43 @@ function applyProjection(map: MapLibreMap, projection: Projection) {
 
 export default function MapCanvas({
   legs,
-  activeId,
+  activeIds,
   onHover,
   onSelect,
-  focusId,
+  focusIds,
   projection,
+  framePadding,
   onReady,
 }: Props) {
+  // Merged once so every framing call agrees, and so a missing side falls back
+  // to a sensible inset rather than zero.
+  const padRef = useRef(framePadding);
+  useEffect(() => {
+    padRef.current = framePadding;
+  }, [framePadding]);
+  const pad = useCallback((base: number) => {
+    const p = padRef.current ?? {};
+    const isNarrow = typeof window !== 'undefined' && window.innerWidth < 1024;
+    return {
+      top: (p.top ?? 0) + base,
+      right: (p.right ?? 0) + base,
+      bottom: (p.bottom ?? 0) + base,
+      // The panel becomes a bottom sheet below lg, so its width stops applying.
+      left: (isNarrow ? 0 : (p.left ?? 0)) + base,
+    };
+  }, []);
+
   const holder = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
   const loaded = useRef(false);
-  const prevActive = useRef<string | null>(null);
+  const prevActive = useRef<string[]>([]);
   const userMoved = useRef(false);
   const programmatic = useRef(false);
-  const focusRef = useRef(focusId);
+  const focusRef = useRef(focusIds);
 
   useEffect(() => {
-    focusRef.current = focusId;
-  }, [focusId]);
+    focusRef.current = focusIds;
+  }, [focusIds]);
 
   // Keep the latest callbacks reachable from MapLibre's own listeners, which
   // are attached once and must not be torn down on every render.
@@ -231,7 +260,7 @@ export default function MapCanvas({
         });
       }
 
-      move(() => map.fitBounds(bounds, { padding: 70, duration: 0 }));
+      move(() => map.fitBounds(bounds, { padding: pad(70), duration: 0 }));
       onReady?.();
     });
 
@@ -253,29 +282,32 @@ export default function MapCanvas({
     (map.getSource('stays') as GeoJSONSource | undefined)?.setData(stays);
     (map.getSource('cities') as GeoJSONSource | undefined)?.setData(cities);
     userMoved.current = false;
-    move(() => map.fitBounds(bounds, { padding: 70, duration: 600 }));
-  }, [routes, stays, cities, bounds, move]);
+    move(() => map.fitBounds(bounds, { padding: pad(70), duration: 600 }));
+  }, [routes, stays, cities, bounds, move, pad]);
 
   // Highlight: feature-state rather than restyling, so it stays cheap.
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !loaded.current) return;
 
-    const setActive = (legId: string | null, value: boolean) => {
-      if (!legId) return;
-      const leg = legs.find((l) => l.id === legId);
-      if (!leg) return;
-      const source = leg.fromCity === leg.toCity ? 'stays' : 'routes';
-      map.setFeatureState({ source, id: legId }, { active: value });
-      for (const city of [leg.fromCity, leg.toCity]) {
-        map.setFeatureState({ source: 'cities', id: city }, { active: value });
+    const setActive = (ids: string[], value: boolean) => {
+      for (const legId of ids) {
+        const leg = legs.find((l) => l.id === legId);
+        if (!leg) continue;
+        const source = leg.fromCity === leg.toCity ? 'stays' : 'routes';
+        map.setFeatureState({ source, id: legId }, { active: value });
+        for (const city of [leg.fromCity, leg.toCity]) {
+          map.setFeatureState({ source: 'cities', id: city }, { active: value });
+        }
       }
     };
 
+    // Clear the previous selection first: a city shared by two legs would
+    // otherwise be switched off again by the leg that no longer owns it.
     setActive(prevActive.current, false);
-    setActive(activeId, true);
-    prevActive.current = activeId;
-  }, [activeId, legs]);
+    setActive(activeIds, true);
+    prevActive.current = activeIds;
+  }, [activeIds, legs]);
 
   // Later projection switches. The first one is applied in the load handler,
   // because this effect runs before the style is ready.
@@ -285,29 +317,40 @@ export default function MapCanvas({
     applyProjection(map, projection);
   }, [projection]);
 
-  // Ease to the focused leg.
+  // Ease to whatever is focused: one leg gets a close-up, a whole country's
+  // worth gets fitted together.
   useEffect(() => {
     const map = mapRef.current;
-    if (!map || !loaded.current || !focusId) return;
-    const leg = legs.find((l) => l.id === focusId);
-    if (!leg) return;
+    if (!map || !loaded.current || !focusIds?.length) return;
+    const focused = legs.filter((l) => focusIds.includes(l.id));
+    if (!focused.length) return;
 
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const duration = reduce ? 0 : 900;
+
     move(() => {
-      if (leg.fromCity === leg.toCity) {
+      const single = focused.length === 1 ? focused[0] : null;
+
+      // A lone stay-episode has no extent to frame, so centre it instead.
+      if (single && single.fromCity === single.toCity) {
         map.easeTo({
-          center: [leg.fromCoords[1], leg.fromCoords[0]],
+          center: [single.fromCoords[1], single.fromCoords[0]],
           zoom: Math.max(map.getZoom(), 7.5),
-          duration: reduce ? 0 : 900,
+          padding: pad(0),
+          duration,
         });
         return;
       }
-      const path = leg.routeGeometry?.length ? leg.routeGeometry : [leg.fromCoords, leg.toCoords];
+
       const b = new LngLatBounds();
-      for (const [lat, lng] of path) b.extend([lng, lat]);
-      map.fitBounds(b, { padding: 110, duration: reduce ? 0 : 900, maxZoom: 9 });
+      for (const leg of focused) {
+        const path = leg.routeGeometry?.length ? leg.routeGeometry : [leg.fromCoords, leg.toCoords];
+        for (const [lat, lng] of path) b.extend([lng, lat]);
+      }
+      if (b.isEmpty()) return;
+      map.fitBounds(b, { padding: pad(110), duration, maxZoom: single ? 9 : 7.5 });
     });
-  }, [focusId, legs, move]);
+  }, [focusIds, legs, move, pad]);
 
   // MapLibre does not watch its container, so a layout change needs a nudge.
   useEffect(() => {
@@ -316,13 +359,13 @@ export default function MapCanvas({
     if (!el || !map) return;
     const observer = new ResizeObserver(() => {
       map.resize();
-      if (!userMoved.current && !focusRef.current && loaded.current) {
-        move(() => map.fitBounds(bounds, { padding: 70, duration: 0 }));
+      if (!userMoved.current && !focusRef.current?.length && loaded.current) {
+        move(() => map.fitBounds(bounds, { padding: pad(70), duration: 0 }));
       }
     });
     observer.observe(el);
     return () => observer.disconnect();
-  }, [bounds, move]);
+  }, [bounds, move, pad]);
 
   return <div ref={holder} className="h-full w-full" />;
 }

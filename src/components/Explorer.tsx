@@ -3,10 +3,12 @@
 import dynamic from 'next/dynamic';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
+import { CITIES } from '@/data/cities';
 import type { Tour } from '@/data/types';
-import Header from './Header';
 import LegCard from './LegCard';
-import Sidebar from './Sidebar';
+import RouteList from './RouteList';
+import StatBlock from './StatBlock';
+import TopBar from './TopBar';
 import VideoModal from './VideoModal';
 import type { Projection } from './MapCanvas';
 
@@ -14,16 +16,16 @@ import type { Projection } from './MapCanvas';
 const MapCanvas = dynamic(() => import('./MapCanvas'), {
   ssr: false,
   loading: () => (
-    <div className="flex h-full w-full items-center justify-center bg-ink-950">
-      <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-mist-600">
-        Loading globe…
-      </span>
+    <div className="grid h-full w-full place-items-center bg-ink-950">
+      <span className="u-label text-[9px] text-mist-600">Loading globe…</span>
     </div>
   ),
 });
 
 /** How long each leg holds the screen during the play-through. */
 const PLAY_INTERVAL_MS = 2600;
+/** Width of the floating panel; the map insets its framing by this much. */
+const PANEL_W = 360;
 
 type Hover = { id: string; source: 'map' | 'list'; point?: { x: number; y: number } };
 
@@ -36,11 +38,29 @@ export default function Explorer({ tour }: { tour: Tour }) {
   const [playing, setPlaying] = useState(false);
   const [playIndex, setPlayIndex] = useState(0);
   const [projection, setProjection] = useState<Projection>('globe');
+  const [hoverCountry, setHoverCountry] = useState<string | null>(null);
+  const [focusCountry, setFocusCountry] = useState<string | null>(null);
 
   // The highlight follows the cursor first, then the play-through, then
   // whatever is open in the modal.
   const activeId = hover?.id ?? (playing ? legs[playIndex]?.id : null) ?? selectedId;
-  const focusId = playing ? legs[playIndex]?.id ?? null : selectedId;
+
+  const legsIn = useCallback(
+    (country: string) => legs.filter((l) => CITIES[l.toCity].country === country),
+    [legs]
+  );
+
+  // Hovering a country outranks a single leg: it is the more specific intent.
+  const activeIds = useMemo(() => {
+    if (hoverCountry) return legsIn(hoverCountry).map((l) => l.id);
+    return activeId ? [activeId] : [];
+  }, [hoverCountry, legsIn, activeId]);
+
+  const focusIds = useMemo(() => {
+    if (focusCountry) return legsIn(focusCountry).map((l) => l.id);
+    const id = playing ? legs[playIndex]?.id ?? null : selectedId;
+    return id ? [id] : null;
+  }, [focusCountry, legsIn, playing, legs, playIndex, selectedId]);
 
   const hoveredLeg = useMemo(
     () => (hover ? legs.find((l) => l.id === hover.id) ?? null : null),
@@ -62,6 +82,7 @@ export default function Explorer({ tour }: { tour: Tour }) {
 
   const handleSelect = useCallback((id: string) => {
     setPlaying(false);
+    setFocusCountry(null);
     setSelectedId(id);
   }, []);
 
@@ -115,64 +136,78 @@ export default function Explorer({ tour }: { tour: Tour }) {
   const showCard = hover?.source === 'map' && hover.point && hoveredLeg;
 
   return (
-    <div className="flex h-full flex-col bg-ink-950">
-      <Header
+    <div className="relative h-full overflow-hidden bg-ink-950">
+      {/* Full-bleed map. Everything else floats on top of it. */}
+      <div className="absolute inset-0">
+        <MapCanvas
+          legs={legs}
+          activeIds={activeIds}
+          onHover={handleMapHover}
+          onSelect={handleSelect}
+          focusIds={focusIds}
+          projection={projection}
+          framePadding={{ left: PANEL_W }}
+        />
+      </div>
+
+      <TopBar
         tour={tour}
         projection={projection}
         onProjectionChange={setProjection}
         playing={playing}
         onTogglePlay={togglePlay}
-        progress={progress}
       />
 
-      <div className="relative flex min-h-0 flex-1">
-        {/* Sidebar — a left rail on desktop, a bottom sheet on small screens. */}
-        <aside
-          className={`z-[1000] flex flex-col border-ink-800 bg-ink-900
-                      lg:relative lg:w-[330px] lg:shrink-0 lg:border-r
-                      max-lg:absolute max-lg:inset-x-0 max-lg:bottom-0 max-lg:rounded-t-2xl
-                      max-lg:border-t max-lg:shadow-[0_-20px_50px_-20px_rgba(0,0,0,0.9)]
-                      max-lg:transition-[height] max-lg:duration-300
-                      ${sheetOpen ? 'max-lg:h-[62%]' : 'max-lg:h-[52px]'}`}
+      {/* The panel — a left rail on desktop, a bottom sheet on small screens. */}
+      <aside
+        style={{ ['--panel-w' as string]: `${PANEL_W}px` }}
+        className={`absolute z-[1000] flex flex-col overflow-hidden
+                    lg:bottom-4 lg:left-4 lg:top-4 lg:w-(--panel-w) lg:rounded-xl
+                    max-lg:inset-x-0 max-lg:bottom-0 max-lg:rounded-t-2xl
+                    max-lg:transition-[height] max-lg:duration-300
+                    u-panel
+                    ${sheetOpen ? 'max-lg:h-[70%]' : 'max-lg:h-[64px]'}`}
+      >
+        {/* Sheet handle — only interactive below lg. */}
+        <button
+          type="button"
+          onClick={() => setSheetOpen((o) => !o)}
+          aria-expanded={sheetOpen}
+          className="flex shrink-0 items-center justify-between px-5 py-3 lg:hidden"
         >
-          <button
-            type="button"
-            onClick={() => setSheetOpen((o) => !o)}
-            aria-expanded={sheetOpen}
-            className="flex shrink-0 items-center justify-between border-b border-ink-800 px-4 py-3
-                       font-mono text-[10px] uppercase tracking-[0.18em] text-mist-500 lg:cursor-default"
-          >
-            <span>The route · {legs.length} legs</span>
-            <span aria-hidden className="lg:hidden">
-              {sheetOpen ? '▾' : '▴'}
-            </span>
-          </button>
+          <span className="u-display text-[13px] text-mist-100">{tour.title}</span>
+          <span className="u-label flex items-center gap-2 text-[9px] text-mist-600">
+            {legs.length} legs
+            <span aria-hidden>{sheetOpen ? '▾' : '▴'}</span>
+          </span>
+        </button>
 
-          <div className="min-h-0 flex-1">
-            <Sidebar
-              legs={legs}
-              activeId={activeId}
-              followActive={hover?.source === 'map' || playing}
-              onHover={handleListHover}
-              onSelect={(id) => {
-                handleSelect(id);
-                setSheetOpen(false);
-              }}
-            />
-          </div>
-        </aside>
+        <div className="hidden lg:block">
+          <StatBlock tour={tour} progress={progress} />
+        </div>
 
-        <main className="relative min-w-0 flex-1">
-          <MapCanvas
+        <div className="min-h-0 flex-1">
+          <RouteList
             legs={legs}
             activeId={activeId}
-            onHover={handleMapHover}
-            onSelect={handleSelect}
-            focusId={focusId}
-            projection={projection}
+            followActive={hover?.source === 'map' || playing}
+            onHover={handleListHover}
+            onSelect={(id) => {
+              handleSelect(id);
+              setSheetOpen(false);
+            }}
+            activeCountry={hoverCountry}
+            onHoverCountry={setHoverCountry}
+            onSelectCountry={(c) => {
+              setPlaying(false);
+              setSelectedId(null);
+              // Re-trigger even if the same country is clicked twice.
+              setFocusCountry(null);
+              requestAnimationFrame(() => setFocusCountry(c));
+            }}
           />
-        </main>
-      </div>
+        </div>
+      </aside>
 
       {showCard && <LegCard leg={hoveredLeg} point={hover.point!} />}
 

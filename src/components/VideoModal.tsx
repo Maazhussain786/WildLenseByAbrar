@@ -45,8 +45,7 @@ export default function VideoModal({ leg, onClose, onStep, hasPrev, hasNext }: P
       />
 
       <div
-        className="relative z-10 w-full max-w-4xl overflow-hidden rounded-2xl border border-ink-700
-                   bg-ink-900 shadow-[0_40px_120px_-20px_rgba(0,0,0,0.9)]"
+        className="u-panel relative z-10 w-full max-w-4xl overflow-hidden rounded-2xl"
       >
         <div className="aspect-video w-full bg-black">
           <iframe
@@ -61,25 +60,24 @@ export default function VideoModal({ leg, onClose, onStep, hasPrev, hasNext }: P
 
         <div className="flex flex-col gap-3 p-4 sm:flex-row sm:items-start sm:gap-5 sm:p-5">
           <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-center gap-2 font-mono text-[10px] uppercase tracking-[0.14em] text-mist-600">
-              <span className="text-ember">Day {leg.order}</span>
+            <div className="flex flex-wrap items-center gap-2.5">
+              <span className="u-display u-tnum text-[17px] text-ember">
+                {String(leg.order).padStart(2, '0')}
+              </span>
+              <span className="u-label text-[8.5px] text-mist-600">Episode {leg.episode}</span>
               <span className="h-3 w-px bg-ink-600" />
-              <span>Episode {leg.episode}</span>
-              <span className="h-3 w-px bg-ink-600" />
-              <span>{MODE_LABEL[leg.mode]}</span>
+              <span className="u-label text-[8.5px] text-mist-600">{MODE_LABEL[leg.mode]}</span>
               {leg.distanceKm ? (
                 <>
                   <span className="h-3 w-px bg-ink-600" />
-                  <span>{formatKm(leg.distanceKm)}</span>
+                  <span className="u-label u-tnum text-[8.5px] text-mist-600">
+                    {formatKm(leg.distanceKm)}
+                  </span>
                 </>
               ) : null}
             </div>
 
-            <h2 className="mt-1.5 text-[15px] font-medium leading-snug text-mist-100">
-              {leg.shortTitle}
-            </h2>
-
-            <p className="mt-1 flex items-center gap-1.5 text-[12px] text-mist-500">
+            <p className="u-display mt-2 flex items-baseline gap-1.5 text-[17px] text-mist-100">
               <span>{leg.fromCity}</span>
               {leg.fromCity !== leg.toCity && (
                 <>
@@ -88,6 +86,8 @@ export default function VideoModal({ leg, onClose, onStep, hasPrev, hasNext }: P
                 </>
               )}
             </p>
+
+            <h2 className="mt-1.5 text-[12.5px] leading-snug text-mist-500">{leg.shortTitle}</h2>
 
             {leg.needsReview && (
               <p className="mt-2 rounded-md border border-ink-700 bg-ink-850 px-2.5 py-1.5 text-[11px] leading-relaxed text-mist-500">
@@ -121,7 +121,7 @@ export default function VideoModal({ leg, onClose, onStep, hasPrev, hasNext }: P
               href={leg.videoUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="rounded-md border border-ember-dim bg-ember/10 px-3 py-2 text-[11px] font-medium
+              className="u-label rounded-md border border-ember-dim bg-ember/10 px-3 py-2.5 text-[9px]
                          text-ember-soft transition-colors hover:bg-ember/20"
             >
               Watch on YouTube

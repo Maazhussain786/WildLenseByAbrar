@@ -34,6 +34,39 @@
   color-scheme: dark;
 }
 
+/* Display type is condensed and always set uppercase and tracked; bundling that
+   here keeps every heading consistent instead of re-declaring it per component. */
+.u-display {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  line-height: 1;
+}
+
+/* Small all-caps label, the counterpart to .u-display for meta rows. */
+.u-label {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  line-height: 1;
+}
+
+.u-tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Floating panels sit over a bright map, so they need real separation from it. */
+.u-panel {
+  background: color-mix(in srgb, var(--color-ink-950) 88%, transparent);
+  backdrop-filter: blur(16px) saturate(140%);
+  border: 1px solid color-mix(in srgb, var(--color-mist-600) 22%, transparent);
+  box-shadow:
+    0 1px 0 0 color-mix(in srgb, var(--color-mist-100) 6%, transparent) inset,
+    0 24px 60px -20px rgb(0 0 0 / 0.85);
+}
+
 html,
 body {
   height: 100%;
