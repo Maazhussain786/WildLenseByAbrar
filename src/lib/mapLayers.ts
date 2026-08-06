@@ -12,6 +12,7 @@ import type { ExpressionSpecification, LayerSpecification } from '@maplibre/mapl
  * in, so plain Node can import this module to check it.
  */
 
+/** Must stay in step with `--color-ember` in app/globals.css. */
 export const ROUTE_ACTIVE = '#ff8a3d';
 const CASING = '#0a0d12';
 const LABEL = '#f2f5f9';

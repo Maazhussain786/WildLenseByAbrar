@@ -140,15 +140,21 @@ export default function Header({
             <Stat value={String(cities)} label="places" />
             <Stat value={distanceKm.toLocaleString('en-US')} label="km" />
 
-            {/* Country rail — doubles as the legend for the route colours. */}
-            <span className="flex items-center gap-1.5">
+            {/* Legend for the route colours. The segments are joined rather
+                than spaced so the palette reads as the single hue ramp it is,
+                running left to right in journey order. */}
+            <span
+              className="flex h-1.5 overflow-hidden rounded-full"
+              role="img"
+              aria-label={`Route colours in order: ${countries.join(', ')}`}
+            >
               {countries.map((c) => (
-                <span key={c} className="flex items-center gap-1" title={c}>
-                  <span
-                    className="h-1.5 w-4 rounded-full"
-                    style={{ background: COUNTRY_COLORS[c as Country] }}
-                  />
-                </span>
+                <span
+                  key={c}
+                  title={c}
+                  className="w-5"
+                  style={{ background: COUNTRY_COLORS[c as Country] }}
+                />
               ))}
             </span>
 

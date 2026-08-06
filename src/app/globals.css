@@ -18,9 +18,11 @@
   --color-mist-300: #aab3c0;
   --color-mist-100: #e6eaf0;
 
-  /* The one accent. Everything highlighted is this colour and nothing else is. */
-  --color-ember: #e8843c;
-  --color-ember-soft: #f2a86e;
+  /* The one accent. Everything highlighted is this colour and nothing else is.
+     Must stay in step with ROUTE_ACTIVE in lib/mapLayers.ts, so the sidebar and
+     the map agree on what "highlighted" looks like. */
+  --color-ember: #ff8a3d;
+  --color-ember-soft: #ffb37a;
   --color-ember-dim: #7a4520;
 
   --font-display: var(--font-display);

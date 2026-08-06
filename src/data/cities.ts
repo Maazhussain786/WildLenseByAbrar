@@ -114,11 +114,27 @@ export function getCity(name: CityName): City {
   return CITIES[name];
 }
 
-/** Country accent colours used for the city dots and the sidebar country rail. */
+/**
+ * Route colours, one per country.
+ *
+ * These walk a single monotonic hue ramp in journey order — rose, violet,
+ * azure, teal, green — so the colour encodes *progress* as well as country:
+ * read west-to-east the route shifts through the spectrum, and the header
+ * legend shows the same ramp left to right. Chroma and lightness are held
+ * roughly constant so the five read as one family rather than a random set.
+ *
+ * The ramp deliberately stops short of orange. That band is reserved for the
+ * highlight (`ROUTE_ACTIVE` in lib/mapLayers.ts) so a hovered leg can never be
+ * confused with a country colour — the previous palette had Saudi Arabia in
+ * amber, which collided with exactly that.
+ *
+ * All five are mid-tone, so they hold up both on the bright terrain basemap
+ * (helped by the dark casing under each route) and on the dark sidebar.
+ */
 export const COUNTRY_COLORS: Record<Country, string> = {
-  Pakistan: '#4ade80',
-  Iran: '#22d3ee',
-  Iraq: '#f472b6',
-  Kuwait: '#c084fc',
-  'Saudi Arabia': '#fbbf24',
+  Pakistan: '#e84a7b', // rose
+  Iran: '#9b5de5', // violet
+  Iraq: '#3a86e0', // azure
+  Kuwait: '#06b49a', // teal
+  'Saudi Arabia': '#7fb236', // green
 };
