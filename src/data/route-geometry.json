@@ -1,5 +1,5 @@
 {
- "ep-01": {
+ "pakistan-to-saudi-arabia/ep-01": {
   "geometry": [
    [
     30.179811,
@@ -683,9 +683,10 @@
    ]
   ],
   "distanceKm": 630.2,
-  "source": "osrm"
+  "source": "osrm",
+  "signature": "Quetta|Taftan|ride"
  },
- "ep-02": {
+ "pakistan-to-saudi-arabia/ep-02": {
   "geometry": [
    [
     28.94827,
@@ -1225,9 +1226,10 @@
    ]
   ],
   "distanceKm": 280.2,
-  "source": "osrm"
+  "source": "osrm",
+  "signature": "Taftan|Iranshahr|ride"
  },
- "ep-03": {
+ "pakistan-to-saudi-arabia/ep-03": {
   "geometry": [
    [
     27.202415,
@@ -1855,14 +1857,16 @@
    ]
   ],
   "distanceKm": 307.7,
-  "source": "osrm"
+  "source": "osrm",
+  "signature": "Iranshahr|Chabahar|ride"
  },
- "ep-04": {
+ "pakistan-to-saudi-arabia/ep-04": {
   "geometry": [],
   "distanceKm": 0,
-  "source": "stay"
+  "source": "stay",
+  "signature": "Chabahar|Chabahar|stay"
  },
- "ep-05": {
+ "pakistan-to-saudi-arabia/ep-05": {
   "geometry": [
    [
     25.292086,
@@ -2246,9 +2250,10 @@
    ]
   ],
   "distanceKm": 348.4,
-  "source": "osrm"
+  "source": "osrm",
+  "signature": "Chabahar|Bandar-e Jask|ride"
  },
- "ep-06": {
+ "pakistan-to-saudi-arabia/ep-06": {
   "geometry": [
    [
     25.646557,
@@ -2780,9 +2785,10 @@
    ]
   ],
   "distanceKm": 334.6,
-  "source": "osrm"
+  "source": "osrm",
+  "signature": "Bandar-e Jask|Bandar Abbas|ride"
  },
- "ep-07": {
+ "pakistan-to-saudi-arabia/ep-07": {
   "geometry": [
    [
     27.1865,
@@ -3046,9 +3052,10 @@
    ]
   ],
   "distanceKm": 25.4,
-  "source": "ferry"
+  "source": "ferry",
+  "signature": "Bandar Abbas|Qeshm|ferry"
  },
- "ep-08": {
+ "pakistan-to-saudi-arabia/ep-08": {
   "geometry": [
    [
     27.186335,
@@ -4004,14 +4011,16 @@
    ]
   ],
   "distanceKm": 576.7,
-  "source": "osrm"
+  "source": "osrm",
+  "signature": "Bandar Abbas|Shiraz|ride"
  },
- "ep-09": {
+ "pakistan-to-saudi-arabia/ep-09": {
   "geometry": [],
   "distanceKm": 0,
-  "source": "stay"
+  "source": "stay",
+  "signature": "Shiraz|Shiraz|stay"
  },
- "ep-10": {
+ "pakistan-to-saudi-arabia/ep-10": {
   "geometry": [
    [
     29.591622,
@@ -4127,9 +4136,10 @@
    ]
   ],
   "distanceKm": 62.6,
-  "source": "osrm"
+  "source": "osrm",
+  "signature": "Shiraz|Persepolis|ride"
  },
- "ep-11": {
+ "pakistan-to-saudi-arabia/ep-11": {
   "geometry": [
    [
     29.5918,
@@ -4393,19 +4403,22 @@
    ]
   ],
   "distanceKm": 989.7,
-  "source": "flight"
+  "source": "flight",
+  "signature": "Shiraz|Mashhad|flight"
  },
- "ep-12": {
+ "pakistan-to-saudi-arabia/ep-12": {
   "geometry": [],
   "distanceKm": 0,
-  "source": "stay"
+  "source": "stay",
+  "signature": "Mashhad|Mashhad|stay"
  },
- "ep-13": {
+ "pakistan-to-saudi-arabia/ep-13": {
   "geometry": [],
   "distanceKm": 0,
-  "source": "stay"
+  "source": "stay",
+  "signature": "Mashhad|Mashhad|stay"
  },
- "ep-14": {
+ "pakistan-to-saudi-arabia/ep-14": {
   "geometry": [
    [
     36.2605,
@@ -4669,19 +4682,22 @@
    ]
   ],
   "distanceKm": 742.9,
-  "source": "train"
+  "source": "train",
+  "signature": "Mashhad|Tehran|train"
  },
- "ep-15": {
+ "pakistan-to-saudi-arabia/ep-15": {
   "geometry": [],
   "distanceKm": 0,
-  "source": "stay"
+  "source": "stay",
+  "signature": "Tehran|Tehran|stay"
  },
- "ep-16": {
+ "pakistan-to-saudi-arabia/ep-16": {
   "geometry": [],
   "distanceKm": 0,
-  "source": "stay"
+  "source": "stay",
+  "signature": "Tehran|Tehran|stay"
  },
- "ep-17": {
+ "pakistan-to-saudi-arabia/ep-17": {
   "geometry": [
    [
     35.688858,
@@ -6157,9 +6173,10 @@
    ]
   ],
   "distanceKm": 893.2,
-  "source": "osrm"
+  "source": "osrm",
+  "signature": "Tehran|Bandar Mahshahr|ride"
  },
- "ep-18": {
+ "pakistan-to-saudi-arabia/ep-18": {
   "geometry": [
    [
     30.558868,
@@ -6335,14 +6352,16 @@
    ]
   ],
   "distanceKm": 159.5,
-  "source": "osrm"
+  "source": "osrm",
+  "signature": "Bandar Mahshahr|Basra|ride"
  },
- "ep-19": {
+ "pakistan-to-saudi-arabia/ep-19": {
   "geometry": [],
   "distanceKm": 0,
-  "source": "stay"
+  "source": "stay",
+  "signature": "Basra|Basra|stay"
  },
- "ep-20": {
+ "pakistan-to-saudi-arabia/ep-20": {
   "geometry": [
    [
     30.508117,
@@ -6470,9 +6489,10 @@
    ]
   ],
   "distanceKm": 73.3,
-  "source": "osrm"
+  "source": "osrm",
+  "signature": "Basra|Al Qurna|ride"
  },
- "ep-21": {
+ "pakistan-to-saudi-arabia/ep-21": {
   "geometry": [
    [
     31.011386,
@@ -6536,9 +6556,10 @@
    ]
   ],
   "distanceKm": 51.4,
-  "source": "osrm"
+  "source": "osrm",
+  "signature": "Al Qurna|Chibayish|ride"
  },
- "ep-22": {
+ "pakistan-to-saudi-arabia/ep-22": {
   "geometry": [
    [
     30.962004,
@@ -7030,14 +7051,16 @@
    ]
   ],
   "distanceKm": 335,
-  "source": "osrm"
+  "source": "osrm",
+  "signature": "Chibayish|Najaf|ride"
  },
- "ep-23": {
+ "pakistan-to-saudi-arabia/ep-23": {
   "geometry": [],
   "distanceKm": 0,
-  "source": "stay"
+  "source": "stay",
+  "signature": "Najaf|Najaf|stay"
  },
- "ep-24": {
+ "pakistan-to-saudi-arabia/ep-24": {
   "geometry": [
    [
     31.995121,
@@ -7125,14 +7148,16 @@
    ]
   ],
   "distanceKm": 82.2,
-  "source": "osrm"
+  "source": "osrm",
+  "signature": "Najaf|Karbala|ride"
  },
- "ep-25": {
+ "pakistan-to-saudi-arabia/ep-25": {
   "geometry": [],
   "distanceKm": 0,
-  "source": "stay"
+  "source": "stay",
+  "signature": "Karbala|Karbala|stay"
  },
- "ep-26": {
+ "pakistan-to-saudi-arabia/ep-26": {
   "geometry": [
    [
     32.616035,
@@ -7264,14 +7289,16 @@
    ]
   ],
   "distanceKm": 99,
-  "source": "osrm"
+  "source": "osrm",
+  "signature": "Karbala|Baghdad|ride"
  },
- "ep-27": {
+ "pakistan-to-saudi-arabia/ep-27": {
   "geometry": [],
   "distanceKm": 0,
-  "source": "stay"
+  "source": "stay",
+  "signature": "Baghdad|Baghdad|stay"
  },
- "ep-28": {
+ "pakistan-to-saudi-arabia/ep-28": {
   "geometry": [
    [
     33.315026,
@@ -7379,9 +7406,10 @@
    ]
   ],
   "distanceKm": 123.7,
-  "source": "osrm"
+  "source": "osrm",
+  "signature": "Baghdad|Samarra|ride"
  },
- "ep-29": {
+ "pakistan-to-saudi-arabia/ep-29": {
   "geometry": [
    [
     33.315026,
@@ -7509,14 +7537,16 @@
    ]
   ],
   "distanceKm": 91.5,
-  "source": "osrm"
+  "source": "osrm",
+  "signature": "Baghdad|Babylon|ride"
  },
- "ep-30": {
+ "pakistan-to-saudi-arabia/ep-30": {
   "geometry": [],
   "distanceKm": 0,
-  "source": "stay"
+  "source": "stay",
+  "signature": "Babylon|Babylon|stay"
  },
- "ep-31": {
+ "pakistan-to-saudi-arabia/ep-31": {
   "geometry": [
    [
     32.463665,
@@ -8128,9 +8158,10 @@
    ]
   ],
   "distanceKm": 459.8,
-  "source": "osrm"
+  "source": "osrm",
+  "signature": "Hillah|Basra|ride"
  },
- "ep-32": {
+ "pakistan-to-saudi-arabia/ep-32": {
   "geometry": [
    [
     30.508117,
@@ -8342,19 +8373,22 @@
    ]
   ],
   "distanceKm": 160.3,
-  "source": "osrm"
+  "source": "osrm",
+  "signature": "Basra|Kuwait City|ride"
  },
- "ep-33": {
+ "pakistan-to-saudi-arabia/ep-33": {
   "geometry": [],
   "distanceKm": 0,
-  "source": "stay"
+  "source": "stay",
+  "signature": "Kuwait City|Kuwait City|stay"
  },
- "ep-34": {
+ "pakistan-to-saudi-arabia/ep-34": {
   "geometry": [],
   "distanceKm": 0,
-  "source": "stay"
+  "source": "stay",
+  "signature": "Kuwait City|Kuwait City|stay"
  },
- "ep-35": {
+ "pakistan-to-saudi-arabia/ep-35": {
   "geometry": [
    [
     29.339632,
@@ -8418,9 +8452,10 @@
    ]
   ],
   "distanceKm": 31.8,
-  "source": "osrm"
+  "source": "osrm",
+  "signature": "Salmiya|Mangaf|ride"
  },
- "ep-36": {
+ "pakistan-to-saudi-arabia/ep-36": {
   "geometry": [
    [
     29.097141,
@@ -8616,9 +8651,10 @@
    ]
   ],
   "distanceKm": 218.5,
-  "source": "osrm"
+  "source": "osrm",
+  "signature": "Mangaf|Qaryat Al Ulya|ride"
  },
- "ep-37": {
+ "pakistan-to-saudi-arabia/ep-37": {
   "geometry": [
    [
     27.556229,
@@ -8858,14 +8894,16 @@
    ]
   ],
   "distanceKm": 397.6,
-  "source": "osrm"
+  "source": "osrm",
+  "signature": "Qaryat Al Ulya|Riyadh|ride"
  },
- "ep-38": {
+ "pakistan-to-saudi-arabia/ep-38": {
   "geometry": [],
   "distanceKm": 0,
-  "source": "stay"
+  "source": "stay",
+  "signature": "Riyadh|Riyadh|stay"
  },
- "ep-39": {
+ "pakistan-to-saudi-arabia/ep-39": {
   "geometry": [
    [
     24.71363,
@@ -8897,9 +8935,10 @@
    ]
   ],
   "distanceKm": 15.1,
-  "source": "osrm"
+  "source": "osrm",
+  "signature": "Riyadh|Diriyah|ride"
  },
- "ep-40": {
+ "pakistan-to-saudi-arabia/ep-40": {
   "geometry": [
    [
     24.71363,
@@ -9315,14 +9354,16 @@
    ]
   ],
   "distanceKm": 826,
-  "source": "osrm"
+  "source": "osrm",
+  "signature": "Riyadh|Medina|ride"
  },
- "ep-41": {
+ "pakistan-to-saudi-arabia/ep-41": {
   "geometry": [],
   "distanceKm": 0,
-  "source": "stay"
+  "source": "stay",
+  "signature": "Medina|Medina|stay"
  },
- "ep-42": {
+ "pakistan-to-saudi-arabia/ep-42": {
   "geometry": [
    [
     24.467132,
@@ -10026,19 +10067,22 @@
    ]
   ],
   "distanceKm": 442.7,
-  "source": "osrm"
+  "source": "osrm",
+  "signature": "Medina|Mecca|ride"
  },
- "ep-43": {
+ "pakistan-to-saudi-arabia/ep-43": {
   "geometry": [],
   "distanceKm": 0,
-  "source": "stay"
+  "source": "stay",
+  "signature": "Mecca|Mecca|stay"
  },
- "ep-44": {
+ "pakistan-to-saudi-arabia/ep-44": {
   "geometry": [],
   "distanceKm": 0,
-  "source": "stay"
+  "source": "stay",
+  "signature": "Mecca|Mecca|stay"
  },
- "ep-45": {
+ "pakistan-to-saudi-arabia/ep-45": {
   "geometry": [
    [
     21.3891,
@@ -10302,9 +10346,10 @@
    ]
   ],
   "distanceKm": 343.3,
-  "source": "train"
+  "source": "train",
+  "signature": "Mecca|Medina|train"
  },
- "ep-46": {
+ "pakistan-to-saudi-arabia/ep-46": {
   "geometry": [
    [
     24.467132,
@@ -10380,14 +10425,16 @@
    ]
   ],
   "distanceKm": 43.3,
-  "source": "osrm"
+  "source": "osrm",
+  "signature": "Medina|Wadi Al-Jinn|ride"
  },
- "ep-47": {
+ "pakistan-to-saudi-arabia/ep-47": {
   "geometry": [],
   "distanceKm": 0,
-  "source": "stay"
+  "source": "stay",
+  "signature": "Medina|Medina|stay"
  },
- "ep-48": {
+ "pakistan-to-saudi-arabia/ep-48": {
   "geometry": [
    [
     24.467132,
@@ -10631,9 +10678,10 @@
    ]
   ],
   "distanceKm": 175.5,
-  "source": "osrm"
+  "source": "osrm",
+  "signature": "Medina|Khaybar|ride"
  },
- "ep-49": {
+ "pakistan-to-saudi-arabia/ep-49": {
   "geometry": [
    [
     24.467132,
@@ -11337,16 +11385,19 @@
    ]
   ],
   "distanceKm": 442.7,
-  "source": "osrm"
+  "source": "osrm",
+  "signature": "Medina|Mecca|ride"
  },
- "ep-50": {
+ "pakistan-to-saudi-arabia/ep-50": {
   "geometry": [],
   "distanceKm": 0,
-  "source": "stay"
+  "source": "stay",
+  "signature": "Mecca|Mecca|stay"
  },
- "ep-51": {
+ "pakistan-to-saudi-arabia/ep-51": {
   "geometry": [],
   "distanceKm": 0,
-  "source": "stay"
+  "source": "stay",
+  "signature": "Mecca|Mecca|stay"
  }
 }

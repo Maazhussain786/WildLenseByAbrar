@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 
-import type { Leg } from '@/data/legs';
+import type { Leg } from '@/data/types';
 import { formatKm, MODE_LABEL } from '@/lib/journey';
 
 type Props = {

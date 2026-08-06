@@ -8,18 +8,18 @@
     "start": "next start",
     "lint": "eslint",
     "build:routes": "node scripts/build-routes.mjs",
-    "review": "node scripts/list-review.mjs"
+    "review": "node scripts/list-review.mjs",
+    "check:map": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-map-style.mjs"
   },
   "dependencies": {
-    "leaflet": "^1.9.4",
+    "maplibre-gl": "^5.24.0",
     "next": "16.3.0",
     "react": "19.2.8",
     "react-dom": "19.2.8",
-    "react-leaflet": "^5.0.0"
+    "@maplibre/maplibre-gl-style-spec": "^26.2.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
-    "@types/leaflet": "^1.9.22",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

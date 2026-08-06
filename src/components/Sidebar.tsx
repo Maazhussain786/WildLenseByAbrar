@@ -3,7 +3,7 @@
 import { useEffect, useRef } from 'react';
 
 import { COUNTRY_COLORS } from '@/data/cities';
-import type { Leg } from '@/data/legs';
+import type { Leg } from '@/data/types';
 import { formatKm, groupByCountry, MODE_LABEL } from '@/lib/journey';
 
 type Props = {

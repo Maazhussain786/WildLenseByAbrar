@@ -1,58 +1,28 @@
+import type { AuthoredLeg, TourMeta } from '../types';
+
 /**
- * Single source of truth for the journey.
+ * Pakistan → Saudi Arabia, the 51-episode Season 5 series.
  *
- * Every entry is one video from the playlist
- * https://www.youtube.com/playlist?list=PLSjc2o-bXB-oxawtq5CJ9KCuXYF3ag51z
- * in playlist order. Video ids, titles and durations were scraped from the
- * public playlist page; `fromCity`/`toCity` come from the "Route:" line in
- * each video's own description, falling back to the title where that line is
- * blank or stale.
+ * Video ids, titles and durations were scraped from the public playlist page.
+ * `fromCity`/`toCity` come from the "Route:" line in each video's own
+ * description, falling back to the title where that line is blank or repeated
+ * from a previous episode.
  *
  * `needsReview: true` means at least one field was inferred rather than read
  * straight from the source — `reviewNote` says exactly what was assumed.
- * Fix those by editing the entry here; nothing else needs to change.
- *
- * Road geometry is NOT stored in this file. `npm run build:routes` fetches it
- * once from OSRM into `route-geometry.json`, which is merged in below, so the
- * browser never does any routing.
+ * Run `npm run review` to list them. To correct one, edit the entry, drop both
+ * review fields, then re-run `npm run build:routes`.
  */
-import rawGeometry from './route-geometry.json';
-import { CITIES, type CityName } from './cities';
-
-/** How the distance was covered. Only `ride` legs get real road routing. */
-export type LegMode = 'ride' | 'stay' | 'ferry' | 'flight' | 'train';
-
-export type Leg = {
-  id: string;
-  /** Journey order, 1..n — matches playlist order. */
-  order: number;
-  /** Episode number as printed in the title. */
-  episode: number;
-  videoId: string;
-  videoUrl: string;
-  /** Full YouTube title, unmodified. */
-  title: string;
-  /** Title with the series branding stripped, for cards and the sidebar. */
-  shortTitle: string;
-  thumbnail: string;
-  duration: string;
-  fromCity: CityName;
-  toCity: CityName;
-  fromCoords: [number, number];
-  toCoords: [number, number];
-  mode: LegMode;
-  /** Cached path: real road geometry for rides, a smooth curve otherwise. */
-  routeGeometry?: [number, number][];
-  /** Length of `routeGeometry` in km. */
-  distanceKm?: number;
-  /** True when any field above was guessed. */
-  needsReview?: boolean;
-  reviewNote?: string;
+export const meta: TourMeta = {
+  id: 'pakistan-to-saudi-arabia',
+  title: 'Pakistan → Saudi Arabia',
+  blurb: 'Quetta to Mecca the long way, through Iran, Iraq and Kuwait.',
+  playlistId: 'PLSjc2o-bXB-oxawtq5CJ9KCuXYF3ag51z',
+  status: 'mapped',
+  years: '2022',
 };
 
-type AuthoredLeg = Omit<Leg, 'fromCoords' | 'toCoords' | 'routeGeometry' | 'distanceKm'>;
-
-const AUTHORED: AuthoredLeg[] = [
+export const legs: AuthoredLeg[] = [
   {
     id: "ep-01",
     order: 1,
@@ -794,37 +764,3 @@ const AUTHORED: AuthoredLeg[] = [
     mode: "stay",
   },
 ];
-
-type GeometryEntry = { geometry: [number, number][]; distanceKm: number; source: string };
-// TypeScript widens JSON arrays to number[][]; the generator guarantees pairs.
-const GEOMETRY = rawGeometry as unknown as Record<string, GeometryEntry>;
-
-/** Legs with city coordinates and cached geometry attached. */
-export const LEGS: Leg[] = AUTHORED.map((leg) => {
-  const cached = GEOMETRY[leg.id];
-  return {
-    ...leg,
-    fromCoords: CITIES[leg.fromCity].coords as [number, number],
-    toCoords: CITIES[leg.toCity].coords as [number, number],
-    routeGeometry: cached?.geometry,
-    distanceKm: cached?.distanceKm,
-  };
-});
-
-export const LEGS_BY_ID = new Map(LEGS.map((l) => [l.id, l]));
-
-/** Distinct places visited, in first-seen order. */
-export const VISITED_CITIES: CityName[] = (() => {
-  const seen = new Set<CityName>();
-  for (const l of LEGS) {
-    seen.add(l.fromCity);
-    seen.add(l.toCity);
-  }
-  return [...seen];
-})();
-
-export const TOTAL_DISTANCE_KM = Math.round(
-  LEGS.reduce((sum, l) => sum + (l.distanceKm ?? 0), 0)
-);
-
-export const LEGS_NEEDING_REVIEW = LEGS.filter((l) => l.needsReview);

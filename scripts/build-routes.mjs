@@ -125,24 +125,39 @@ async function fetchRoad(from, to) {
 // --- main -------------------------------------------------------------------
 
 // Read the authored legs without pulling in TypeScript: the fields we need are
-// simple literals, so a targeted parse of legs.ts is enough.
+// simple literals, so a targeted parse of each tour module is enough.
 function readLegs() {
-  const src = fs.readFileSync(path.join(DATA_DIR, 'legs.ts'), 'utf8');
   const cities = readCities();
+  const toursDir = path.join(DATA_DIR, 'tours');
+  const files = fs
+    .readdirSync(toursDir)
+    .filter((f) => f.endsWith('.ts') && f !== 'index.ts')
+    .sort();
+
   const legs = [];
-  const blockRe = /\{\s*id: "(ep-\d+)",([\s\S]*?)\n  \},/g;
-  let m;
-  while ((m = blockRe.exec(src))) {
-    const [, id, body] = m;
-    const get = (key) => body.match(new RegExp(`${key}: "([^"]*)"`))?.[1];
-    legs.push({
-      id,
-      fromCity: get('fromCity'),
-      toCity: get('toCity'),
-      mode: get('mode'),
-      from: cities[get('fromCity')],
-      to: cities[get('toCity')],
-    });
+  for (const file of files) {
+    const src = fs.readFileSync(path.join(toursDir, file), 'utf8');
+    const tourId = src.match(/id: '([^']+)'/)?.[1];
+    if (!tourId) {
+      console.warn(`! ${file}: no tour id found, skipping`);
+      continue;
+    }
+    const blockRe = /\{\s*id: "(ep-\d+)",([\s\S]*?)\n  \},/g;
+    let m;
+    while ((m = blockRe.exec(src))) {
+      const [, id, body] = m;
+      const get = (key) => body.match(new RegExp(`${key}: "([^"]*)"`))?.[1];
+      legs.push({
+        tourId,
+        id,
+        key: `${tourId}/${id}`,
+        fromCity: get('fromCity'),
+        toCity: get('toCity'),
+        mode: get('mode'),
+        from: cities[get('fromCity')],
+        to: cities[get('toCity')],
+      });
+    }
   }
   return legs;
 }
@@ -157,22 +172,39 @@ function readCities() {
 }
 
 const legs = readLegs();
-if (!legs.length) throw new Error('parsed no legs out of legs.ts');
+if (!legs.length) throw new Error('parsed no legs out of src/data/tours');
+
+// A leg only needs re-routing if its endpoints or travel mode changed. Anything
+// still matching its cached signature is reused, so adding one tour does not
+// re-request every road in the others. `--force` re-fetches everything.
+const force = process.argv.includes('--force');
+const previous = fs.existsSync(OUT) ? JSON.parse(fs.readFileSync(OUT, 'utf8')) : {};
+for (const leg of legs) {
+  leg.signature = `${leg.fromCity}|${leg.toCity}|${leg.mode}`;
+}
 
 const result = {};
 let routed = 0;
 let curved = 0;
 let stays = 0;
+let reused = 0;
 
 for (const leg of legs) {
   if (!leg.from || !leg.to) {
-    console.warn(`! ${leg.id}: missing coords for ${leg.fromCity} -> ${leg.toCity}`);
+    console.warn(`! ${leg.key}: missing coords for ${leg.fromCity} -> ${leg.toCity}`);
+    continue;
+  }
+
+  const cached = previous[leg.key];
+  if (!force && cached?.signature === leg.signature && Array.isArray(cached.geometry)) {
+    result[leg.key] = cached;
+    reused++;
     continue;
   }
 
   // Same place: nothing to draw, the city marker carries the episode.
   if (leg.from[0] === leg.to[0] && leg.from[1] === leg.to[1]) {
-    result[leg.id] = { geometry: [], distanceKm: 0, source: 'stay' };
+    result[leg.key] = { geometry: [], distanceKm: 0, source: 'stay', signature: leg.signature };
     stays++;
     console.log(`- ${leg.id}  ${leg.fromCity} (stay)`);
     continue;
@@ -180,10 +212,11 @@ for (const leg of legs) {
 
   if (leg.mode !== 'ride') {
     const geometry = curveBetween(leg.from, leg.to);
-    result[leg.id] = {
+    result[leg.key] = {
       geometry,
       distanceKm: Number(haversineKm(leg.from, leg.to).toFixed(1)),
       source: leg.mode,
+      signature: leg.signature,
     };
     curved++;
     console.log(`~ ${leg.id}  ${leg.fromCity} -> ${leg.toCity} (${leg.mode}, curve)`);
@@ -193,10 +226,11 @@ for (const leg of legs) {
   try {
     const { points, distanceKm } = await fetchRoad(leg.from, leg.to);
     const geometry = simplify(points, SIMPLIFY_TOLERANCE);
-    result[leg.id] = {
+    result[leg.key] = {
       geometry,
       distanceKm: Number(distanceKm.toFixed(1)),
       source: 'osrm',
+      signature: leg.signature,
     };
     routed++;
     console.log(
@@ -205,10 +239,11 @@ for (const leg of legs) {
     );
   } catch (err) {
     const geometry = curveBetween(leg.from, leg.to);
-    result[leg.id] = {
+    result[leg.key] = {
       geometry,
       distanceKm: Number(haversineKm(leg.from, leg.to).toFixed(1)),
       source: 'fallback-curve',
+      signature: leg.signature,
     };
     curved++;
     console.warn(`~ ${leg.id}  ${leg.fromCity} -> ${leg.toCity}  routing failed (${err.message}), using curve`);
@@ -220,7 +255,8 @@ fs.writeFileSync(OUT, JSON.stringify(result, null, 1));
 
 const total = Object.values(result).reduce((s, r) => s + r.distanceKm, 0);
 console.log(
-  `\n${legs.length} legs -> ${routed} routed, ${curved} curved, ${stays} stays` +
+  `\n${legs.length} legs -> ${routed} routed, ${curved} curved, ${stays} stays, ${reused} reused` +
     `\ntotal ${Math.round(total).toLocaleString('en-US')} km` +
-    `\nwrote ${path.relative(process.cwd(), OUT)}`
+    `\nwrote ${path.relative(process.cwd(), OUT)}` +
+    (reused ? `\n(pass --force to re-fetch the reused ones)` : '')
 );

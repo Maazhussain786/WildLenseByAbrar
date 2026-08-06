@@ -1,5 +1,5 @@
 import { CITIES, type Country } from '@/data/cities';
-import { LEGS, TOTAL_DISTANCE_KM, VISITED_CITIES, type Leg, type LegMode } from '@/data/legs';
+import type { Leg, LegMode } from '@/data/types';
 
 export const MODE_LABEL: Record<LegMode, string> = {
   ride: 'Ride',
@@ -9,17 +9,9 @@ export const MODE_LABEL: Record<LegMode, string> = {
   train: 'Train',
 };
 
-/** Header stat line. */
-export const JOURNEY_STATS = {
-  legs: LEGS.length,
-  cities: VISITED_CITIES.length,
-  distanceKm: TOTAL_DISTANCE_KM,
-  countries: [...new Set(VISITED_CITIES.map((c) => CITIES[c].country))] as Country[],
-};
-
 /**
- * Legs grouped into the country they end up in, so the sidebar can show where
- * one leg of the trip becomes the next.
+ * Legs grouped into the country they end up in, so the sidebar shows where one
+ * stretch of the journey becomes the next.
  */
 export function groupByCountry(legs: Leg[]): { country: Country; legs: Leg[] }[] {
   const out: { country: Country; legs: Leg[] }[] = [];

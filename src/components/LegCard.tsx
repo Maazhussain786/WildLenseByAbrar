@@ -2,7 +2,7 @@
 
 import { useLayoutEffect, useRef, useState } from 'react';
 
-import type { Leg } from '@/data/legs';
+import type { Leg } from '@/data/types';
 import { MODE_LABEL } from '@/lib/journey';
 
 const CARD_W = 290;
