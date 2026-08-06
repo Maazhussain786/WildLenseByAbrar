@@ -796,7 +796,8 @@ const AUTHORED: AuthoredLeg[] = [
 ];
 
 type GeometryEntry = { geometry: [number, number][]; distanceKm: number; source: string };
-const GEOMETRY = rawGeometry as Record<string, GeometryEntry>;
+// TypeScript widens JSON arrays to number[][]; the generator guarantees pairs.
+const GEOMETRY = rawGeometry as unknown as Record<string, GeometryEntry>;
 
 /** Legs with city coordinates and cached geometry attached. */
 export const LEGS: Leg[] = AUTHORED.map((leg) => {
